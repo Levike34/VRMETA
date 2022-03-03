@@ -9,6 +9,19 @@ mod timestake {
 use ink_storage::traits::SpreadAllocate;
 use ink_storage::Mapping;
 
+#[ink(event)]
+pub struct Connected {
+    caller: AccountId,
+    timestamp: u64,
+}
+
+#[ink(event)]
+pub struct Disconnected {
+    caller: AccountId,
+    timestamp: u64,
+    reward_to_pay: u64
+}
+
     /// Defines the storage of your contract.
     /// Add new fields to the below struct in order
     /// to add new static storage fields to your contract.
@@ -58,6 +71,10 @@ use ink_storage::Mapping;
             let timestamp = self.env().block_timestamp();
             self.is_connected.insert(caller, &true);
             self.start_time.insert(caller, &timestamp);
+            self.env().emit_event(Connected {
+                caller,
+                timestamp
+            });
         }
 
         #[ink(message, payable)]
@@ -81,6 +98,11 @@ use ink_storage::Mapping;
                     "Some hol' up bro."
                 )
             }
+            self.env().emit_event(Disconnected {
+                caller,
+                timestamp,
+                reward_to_pay
+            });
         }
 
         /// Simply returns the current value of our reward per hour.
