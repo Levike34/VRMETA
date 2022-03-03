@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xa27232cab151916a933e7c0053d8db708a9cddcf9a9227d6212713b8400c7397",
+    "hash": "0x5c01704999767e4d6d53995bd44c997ce5b4a937b693f3f1cfcef368c025fd88",
     "language": "ink! 3.0.0-rc9",
     "compiler": "rustc 1.61.0-nightly"
   },
@@ -23,7 +23,75 @@
         }
       ],
       "docs": [],
-      "events": [],
+      "events": [
+        {
+          "args": [
+            {
+              "docs": [],
+              "indexed": false,
+              "label": "caller",
+              "type": {
+                "displayName": [
+                  "AccountId"
+                ],
+                "type": 1
+              }
+            },
+            {
+              "docs": [],
+              "indexed": false,
+              "label": "timestamp",
+              "type": {
+                "displayName": [
+                  "u64"
+                ],
+                "type": 7
+              }
+            }
+          ],
+          "docs": [],
+          "label": "Connected"
+        },
+        {
+          "args": [
+            {
+              "docs": [],
+              "indexed": false,
+              "label": "caller",
+              "type": {
+                "displayName": [
+                  "AccountId"
+                ],
+                "type": 1
+              }
+            },
+            {
+              "docs": [],
+              "indexed": false,
+              "label": "timestamp",
+              "type": {
+                "displayName": [
+                  "u64"
+                ],
+                "type": 7
+              }
+            },
+            {
+              "docs": [],
+              "indexed": false,
+              "label": "reward_to_pay",
+              "type": {
+                "displayName": [
+                  "u64"
+                ],
+                "type": 7
+              }
+            }
+          ],
+          "docs": [],
+          "label": "Disconnected"
+        }
+      ],
       "messages": [
         {
           "args": [],
