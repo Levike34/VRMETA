@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x5c01704999767e4d6d53995bd44c997ce5b4a937b693f3f1cfcef368c025fd88",
+    "hash": "0xb49df353c2f385846ae69436c5dbac914faad31404c094f567c2906fbd388832",
     "language": "ink! 3.0.0-rc9",
     "compiler": "rustc 1.61.0-nightly"
   },
@@ -28,24 +28,24 @@
           "args": [
             {
               "docs": [],
-              "indexed": false,
+              "indexed": true,
               "label": "caller",
               "type": {
                 "displayName": [
-                  "AccountId"
+                  "Option"
                 ],
-                "type": 1
+                "type": 13
               }
             },
             {
               "docs": [],
-              "indexed": false,
+              "indexed": true,
               "label": "timestamp",
               "type": {
                 "displayName": [
-                  "u64"
+                  "Option"
                 ],
-                "type": 7
+                "type": 14
               }
             }
           ],
@@ -56,35 +56,35 @@
           "args": [
             {
               "docs": [],
-              "indexed": false,
+              "indexed": true,
               "label": "caller",
               "type": {
                 "displayName": [
-                  "AccountId"
+                  "Option"
                 ],
-                "type": 1
+                "type": 13
               }
             },
             {
               "docs": [],
-              "indexed": false,
+              "indexed": true,
               "label": "timestamp",
               "type": {
                 "displayName": [
-                  "u64"
+                  "Option"
                 ],
-                "type": 7
+                "type": 14
               }
             },
             {
               "docs": [],
-              "indexed": false,
+              "indexed": true,
               "label": "reward_to_pay",
               "type": {
                 "displayName": [
-                  "u64"
+                  "Option"
                 ],
-                "type": 7
+                "type": 14
               }
             }
           ],
@@ -99,7 +99,12 @@
           "label": "connect",
           "mutates": true,
           "payable": false,
-          "returnType": null,
+          "returnType": {
+            "displayName": [
+              "Result"
+            ],
+            "type": 10
+          },
           "selector": "0x6dea651a"
         },
         {
@@ -143,7 +148,12 @@
           "label": "set_reward_hourly",
           "mutates": true,
           "payable": false,
-          "returnType": null,
+          "returnType": {
+            "displayName": [
+              "Result"
+            ],
+            "type": 10
+          },
           "selector": "0x5b1426d0"
         },
         {
@@ -429,6 +439,146 @@
           "def": {
             "primitive": "u128"
           }
+        }
+      },
+      {
+        "id": 10,
+        "type": {
+          "def": {
+            "variant": {
+              "variants": [
+                {
+                  "fields": [
+                    {
+                      "type": 11
+                    }
+                  ],
+                  "index": 0,
+                  "name": "Ok"
+                },
+                {
+                  "fields": [
+                    {
+                      "type": 12
+                    }
+                  ],
+                  "index": 1,
+                  "name": "Err"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "T",
+              "type": 11
+            },
+            {
+              "name": "E",
+              "type": 12
+            }
+          ],
+          "path": [
+            "Result"
+          ]
+        }
+      },
+      {
+        "id": 11,
+        "type": {
+          "def": {
+            "tuple": []
+          }
+        }
+      },
+      {
+        "id": 12,
+        "type": {
+          "def": {
+            "variant": {
+              "variants": [
+                {
+                  "index": 0,
+                  "name": "NonOwner"
+                },
+                {
+                  "index": 1,
+                  "name": "AlreadyConnected"
+                }
+              ]
+            }
+          },
+          "path": [
+            "timestake",
+            "timestake",
+            "Error"
+          ]
+        }
+      },
+      {
+        "id": 13,
+        "type": {
+          "def": {
+            "variant": {
+              "variants": [
+                {
+                  "index": 0,
+                  "name": "None"
+                },
+                {
+                  "fields": [
+                    {
+                      "type": 1
+                    }
+                  ],
+                  "index": 1,
+                  "name": "Some"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "T",
+              "type": 1
+            }
+          ],
+          "path": [
+            "Option"
+          ]
+        }
+      },
+      {
+        "id": 14,
+        "type": {
+          "def": {
+            "variant": {
+              "variants": [
+                {
+                  "index": 0,
+                  "name": "None"
+                },
+                {
+                  "fields": [
+                    {
+                      "type": 7
+                    }
+                  ],
+                  "index": 1,
+                  "name": "Some"
+                }
+              ]
+            }
+          },
+          "params": [
+            {
+              "name": "T",
+              "type": 7
+            }
+          ],
+          "path": [
+            "Option"
+          ]
         }
       }
     ]

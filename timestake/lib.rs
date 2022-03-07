@@ -9,17 +9,33 @@ mod timestake {
 use ink_storage::traits::SpreadAllocate;
 use ink_storage::Mapping;
 
+#[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
+#[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
+pub enum Error {
+    /// Returned if caller is not the owner.
+    NonOwner,
+    /// Returned if caller is already connected.
+    AlreadyConnected
+}
+
+pub type Result<T> = core::result::Result<T, Error>;
+
 #[ink(event)]
 pub struct Connected {
-    caller: AccountId,
-    timestamp: u64,
+    #[ink(topic)]
+    caller: Option<AccountId>,
+    #[ink(topic)]
+    timestamp: Option<u64>,
 }
 
 #[ink(event)]
 pub struct Disconnected {
-    caller: AccountId,
-    timestamp: u64,
-    reward_to_pay: u64
+    #[ink(topic)]
+    caller: Option<AccountId>,
+    #[ink(topic)]
+    timestamp: Option<u64>,
+    #[ink(topic)]
+    reward_to_pay: Option<u64>
 }
 
     /// Defines the storage of your contract.
@@ -66,15 +82,20 @@ pub struct Disconnected {
 
       
         #[ink(message)]
-        pub fn connect(&mut self) {
+        pub fn connect(&mut self) -> Result<()> {
             let caller: AccountId = self.env().caller();
             let timestamp = self.env().block_timestamp();
+            
+            if self.is_connected.get(&caller).unwrap() {
+                return Err(Error::AlreadyConnected)
+            }
             self.is_connected.insert(caller, &true);
             self.start_time.insert(caller, &timestamp);
             self.env().emit_event(Connected {
-                caller,
-                timestamp
+                caller: Some(caller),
+                timestamp: Some(timestamp)
             });
+            Ok(())
         }
 
         #[ink(message, payable)]
@@ -99,9 +120,9 @@ pub struct Disconnected {
                 )
             }
             self.env().emit_event(Disconnected {
-                caller,
-                timestamp,
-                reward_to_pay
+                caller: Some(caller),
+                timestamp: Some(timestamp),
+                reward_to_pay: Some(reward_to_pay)
             });
         }
 
@@ -112,8 +133,15 @@ pub struct Disconnected {
         }
 
         #[ink(message)]
-        pub fn set_reward_hourly(&mut self, tokens_per_hour: u64) {
-            self.reward_rate_per_hour = tokens_per_hour * 1_000_000_000_000
+        pub fn set_reward_hourly(&mut self, tokens_per_hour: u64) -> Result<()> {
+            let caller: AccountId = self.env().caller();
+
+            if caller != self.owner {
+                return Err(Error::NonOwner)
+            }
+
+            self.reward_rate_per_hour = tokens_per_hour * 1_000_000_000_000;
+            Ok(())
         }
 
 
