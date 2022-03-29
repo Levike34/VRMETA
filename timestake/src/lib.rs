@@ -6,6 +6,7 @@
 pub use pallet::*;
 
 
+
 #[frame_support::pallet]
 pub mod pallet {
 	use frame_support::{pallet_prelude::*};
@@ -14,8 +15,15 @@ pub mod pallet {
 
   ///  use sp_arithmetic::traits::SaturatedConversion;
 
-   
-      
+   pub type NegativeImbalanceOf<T> = <<T as Config>::Vrmeta as Currency<<T as frame_system::Config>::AccountId>>::NegativeImbalance;
+   pub type BalanceOf<T> = <<T as Config>::Vrmeta as Currency<<T as frame_system::Config>::AccountId>>::Balance;
+
+   impl<T: Config> Pallet<T> {
+    pub fn switch(i: u32) -> BalanceOf<T> {
+        i.into()
+    }
+
+}
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
@@ -25,7 +33,8 @@ pub mod pallet {
         // The type used to store balances.
         type TimeProvider: UnixTime;
         // Balances
-        type Vrmeta: Currency<Self::AccountId>;       	
+        type Vrmeta: Currency<Self::AccountId>;    
+         
 	}
 
 	#[pallet::pallet]
@@ -40,7 +49,7 @@ pub mod pallet {
         /// Event emitted when connected. [who, timestamp]
         Connected(T::AccountId, u64),
         /// Event emitted when disconnected. [who, mined]
-        Disconnected(T::AccountId, u64),
+        Disconnected(T::AccountId, u64, BalanceOf<T>),
     }
 
 	// Errors inform users that something went wrong.
@@ -75,9 +84,7 @@ pub mod pallet {
         pub fn connect(
             origin: OriginFor<T>,
         ) -> DispatchResult {
-            // Check that the extrinsic was signed and get the signer.
-            // This function will return an error if the extrinsic is not signed.
-            // https://docs.substrate.io/v3/runtime/origins
+            
             let sender = ensure_signed(origin)?;
 
             // Verify that the specified proof has not already been claimed.
@@ -99,7 +106,7 @@ pub mod pallet {
         #[pallet::weight(1_000)]
         pub fn disconnect(
             origin: OriginFor<T>,
-        ) -> DispatchResult  {
+        ) -> DispatchResult {
             // Check that the extrinsic was signed and get the signer.
             // This function will return an error if the extrinsic is not signed.
             // https://docs.substrate.io/v3/runtime/origins
@@ -107,34 +114,29 @@ pub mod pallet {
 
             // Verify that the specified proof has been claimed.
             //ensure!(!Players::<T>::get(&sender), Error::<T>::NotConnected);
-
-            // Remove claim from storage.
         
             let reward = Players::<T>::get(&sender).unwrap();
             let current_time: u64 = T::TimeProvider::now().as_secs();
             let time_played = current_time - reward;
+            let fix_time: u32 = time_played as u32;
+            let multiplier: BalanceOf<T> = Self::switch(fix_time);
+            let coin_per_hour: BalanceOf<T> = Self::switch(1_000_000_000);
+            let divisor: BalanceOf<T> = Self::switch(3_600_000);
 
-
-          
-            let common_num = T::Vrmeta::minimum_balance();
-          // let slashed_amount = T::Vrmeta::slash(&sender, balance_of);
-
-            
             //let issue: T::Vrmeta<Self:AccountId> = 1_000_000_000;
-            let amount_to_give = T::Vrmeta::issue(common_num / common_num);
-
-         
-            let tx = T::Vrmeta::resolve_into_existing(&sender, amount_to_give);
+            let amount_to_give: BalanceOf<T> = (multiplier / divisor) * coin_per_hour;       
+            let tx = T::Vrmeta::deposit_into_existing(&sender, amount_to_give);
 
             //let reward_to_pay = (time_played / 3_600_000u64) * 1_000_000_000u64;
 
-
-            // Emit an event that the claim was erased.
             Players::<T>::remove(&sender);
-            Self::deposit_event(Event::Disconnected(sender, common_num));
+            Self::deposit_event(Event::Disconnected(sender, time_played, amount_to_give));
             Ok(())
         }
+       
         
         }
+
+        
    
 }
