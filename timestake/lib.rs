@@ -48,13 +48,13 @@ pub struct Disconnected {
         is_connected:  Mapping<AccountId, bool>,
         /// Store start time
         start_time: Mapping<AccountId, u64>,
-        //  Store end time
+        ///  Store end time
         end_time:  Mapping<AccountId, u64>,
-        //  Reward accumulated
+        ///  Reward accumulated
         reward:  Mapping<AccountId, Balance>,
-        // Coins rewarded per hour
+        /// Coins rewarded per hour
         reward_rate_per_hour: u64,
-        // Owner
+        /// Owner
         owner: AccountId
         
     }
@@ -80,24 +80,27 @@ pub struct Disconnected {
         self.reward_rate_per_hour = 1_000_000_000;
     }
 
-      
         #[ink(message)]
         pub fn connect(&mut self) -> Result<()> {
             let caller: AccountId = self.env().caller();
             let timestamp = self.env().block_timestamp();
+            let is_connected = self.is_connected.get(&caller).unwrap();
             
-            if self.is_connected.get(&caller).unwrap() {
+            if is_connected {
                 return Err(Error::AlreadyConnected)
+            } else {
+                self.is_connected.insert(caller, &true);
+                self.start_time.insert(caller, &timestamp);
+                self.env().emit_event(Connected {
+                    caller: Some(caller),
+                    timestamp: Some(timestamp)
+                });
+                Ok(())
             }
-            self.is_connected.insert(caller, &true);
-            self.start_time.insert(caller, &timestamp);
-            self.env().emit_event(Connected {
-                caller: Some(caller),
-                timestamp: Some(timestamp)
-            });
-            Ok(())
+         
         }
 
+            // Disconnect and receive VRMETA earned.
         #[ink(message, payable)]
         pub fn disconnect(&mut self) {
             let caller: AccountId = self.env().caller();
@@ -106,7 +109,7 @@ pub struct Disconnected {
             let my_time_played: u64 = timestamp - start_time;
             self.is_connected.insert(caller, &false);
             self.start_time.insert(caller, &0);
-            let reward_to_pay: u64 = (my_time_played / 3600) * self.reward_rate_per_hour;
+            let reward_to_pay: u64 = (my_time_played / 3_600_000) * self.reward_rate_per_hour;
             self.reward.insert(caller, &0);
             
             ink_env::debug_println!("requested value: {}", reward_to_pay);
@@ -116,7 +119,7 @@ pub struct Disconnected {
 
             if self.env().transfer(self.env().caller(), reward_to_pay.into()).is_err() {
                 panic!(
-                    "Some hol' up bro."
+                    "Hold up."
                 )
             }
             self.env().emit_event(Disconnected {
@@ -132,6 +135,7 @@ pub struct Disconnected {
             self.reward_rate_per_hour.try_into().unwrap()
         }
 
+        //Sets the hourly reward rate.
         #[ink(message)]
         pub fn set_reward_hourly(&mut self, tokens_per_hour: u64) -> Result<()> {
             let caller: AccountId = self.env().caller();
@@ -146,13 +150,14 @@ pub struct Disconnected {
 
 
 
+        //Returns the total balance of Timestake.
         #[ink(message)]
         pub fn get_total_balance(&self) -> u128 {
             self.env().balance()
         }
 
       
-
+        //Returns the start time of the caller.
         #[ink(message)]
         pub fn get_start_time(&self) -> u64 {
             let caller: AccountId = self.env().caller();
@@ -160,7 +165,7 @@ pub struct Disconnected {
             start_time
         }
 
-        /// Calculate time played in seconds
+        /// Calculate time played in seconds.
         #[ink(message)]
         pub fn get_time_played(&self) -> u64  {
             let caller: AccountId = self.env().caller();

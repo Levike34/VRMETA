@@ -1,36 +1,45 @@
 [package]
-name = "timestake"
-version = "0.1.0"
-authors = ["[your_name] <[your_email]>"]
+name = "pallet-timestake"
+version = "4.0.0-dev"
+description = "FRAME pallet template for defining custom runtime logic."
+authors = ["Substrate DevHub <https://github.com/substrate-developer-hub>"]
+homepage = "https://substrate.io/"
 edition = "2021"
-rust-version = "1.56.1"
+license = "Unlicense"
+publish = false
+
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-ink_primitives = { version = "3.0.0-rc8", default-features = false }
-ink_metadata = { version = "3.0.0-rc8", default-features = false, features = ["derive"], optional = true }
-ink_env = { version = "3.0.0-rc8", default-features = false }
-ink_storage = { version = "3.0.0-rc8", default-features = false }
-ink_lang = { version = "3.0.0-rc8", default-features = false }
+codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = [
+	"derive",
+] }
+pallet-timestamp = { git = "https://github.com/paritytech/substrate", package = "pallet-timestamp", default-features = false }
+scale-info = { version = "2.0.1", default-features = false, features = ["derive"] }
+frame-support = { git = "https://github.com/paritytech/substrate", package = "frame-support", default-features = false }
+frame-system = { git = "https://github.com/paritytech/substrate", package = "frame-system", default-features = false }
+frame-benchmarking = { git = "https://github.com/paritytech/substrate", default-features = false, package = "frame-benchmarking", optional = true }
+sp-runtime = { git = "https://github.com/paritytech/substrate", package = "sp-runtime", default-features = false }
 
-scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
-scale-info = { version = "2", default-features = false, features = ["derive"], optional = true }
+[dev-dependencies]
+sp-core = { git = "https://github.com/paritytech/substrate", package = "sp-core", default-features = false }
+sp-io = { git = "https://github.com/paritytech/substrate", package = "sp-io" , default-features = false}
 
-[lib]
-name = "timestake"
-path = "lib.rs"
-crate-type = [
-	# Used for normal contract Wasm blobs.
-	"cdylib",
-]
+
+
 
 [features]
 default = ["std"]
 std = [
-    "ink_metadata/std",
-    "ink_env/std",
-    "ink_storage/std",
-    "ink_primitives/std",
-    "scale/std",
-    "scale-info/std",
+	"codec/std",
+	"scale-info/std",
+	"frame-support/std",
+	"frame-system/std",
+	"frame-benchmarking/std",
+	"sp-runtime/std",
 ]
-ink-as-dependency = []
+
+runtime-benchmarks = ["frame-benchmarking/runtime-benchmarks"]
+try-runtime = ["frame-support/try-runtime"]
