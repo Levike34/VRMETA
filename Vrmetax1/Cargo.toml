@@ -1,9 +1,12 @@
 [package]
-name = "timestake"
+name = "vrmetax1"
 version = "0.1.0"
 authors = ["[your_name] <[your_email]>"]
 edition = "2021"
 rust-version = "1.56.1"
+
+[profile.release]
+overflow-checks = false
 
 [dependencies]
 ink_primitives = { version = "3.0.0-rc8", default-features = false }
@@ -16,7 +19,7 @@ scale = { package = "parity-scale-codec", version = "3", default-features = fals
 scale-info = { version = "2", default-features = false, features = ["derive"], optional = true }
 
 [lib]
-name = "timestake"
+name = "vrmetax1"
 path = "lib.rs"
 crate-type = [
 	# Used for normal contract Wasm blobs.
