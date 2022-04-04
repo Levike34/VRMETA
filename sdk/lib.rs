@@ -63,7 +63,7 @@ pub struct Bought {
         let caller: AccountId = self.env().caller();
 
         /* Creating a Stripe Charge */
-        let client = stripe::Client::new("sk_test_51KXzTBLr0bYuQcweg3FwiY83G24x0fT7nl6JfjFd97rJVVLdrY3fb1s7Rg8LQq8M75LlfZ4A9drvjuiQWhBr34Wa003Evod6MC");
+        let client = stripe::Client::new("sk_test_SECRET");
         let token = "tok_ID_FROM_CHECKOUT".parse().unwrap();
         let mut params = stripe::CreateCharge::new();
         // NOTE: Stripe represents currency in the lowest denominations (e.g. cents)
