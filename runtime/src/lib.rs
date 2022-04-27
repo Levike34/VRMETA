@@ -38,7 +38,9 @@ pub use frame_support::{
 };
 pub use pallet_balances::Call as BalancesCall;
 pub use pallet_timestamp::Call as TimestampCall;
+
 pub use pallet_timestake;
+pub use pallet_chainless_mint_iou;
 use pallet_transaction_payment::CurrencyAdapter;
 #[cfg(any(feature = "std", test))]
 pub use sp_runtime::BuildStorage;
@@ -111,7 +113,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 /// up by `pallet_aura` to implement `fn slot_duration()`.
 ///
 /// Change this to adjust the block time.
-pub const MILLISECS_PER_BLOCK: u64 = 6000;
+pub const MILLISECS_PER_BLOCK: u64 = 1000;
 
 // NOTE: Currently it is not possible to change the slot duration after the chain has started.
 //       Attempting to do so will brick block production.
@@ -144,7 +146,7 @@ const CONTRACTS_DEBUG_OUTPUT: bool = true;
 // Unit = the base number of indivisible units for balances
 const UNIT: Balance = 1_000_000_000_000;
 const MILLIUNIT: Balance = 1_000_000_000;
-const EXISTENTIAL_DEPOSIT: Balance = MILLIUNIT;
+const EXISTENTIAL_DEPOSIT: Balance = 1_000_000_000;
 
 const fn deposit(items: u32, bytes: u32) -> Balance {
 	(items as Balance * UNIT + (bytes as Balance) * (5 * MILLIUNIT / 100)) / 10
@@ -300,13 +302,12 @@ impl pallet_balances::Config for Runtime {
 }
 
 parameter_types! {
-	pub const TransactionByteFee: Balance = 1;
 	pub OperationalFeeMultiplier: u8 = 5;
 }
 
 impl pallet_transaction_payment::Config for Runtime {
 	type OnChargeTransaction = CurrencyAdapter<Balances, ()>;
-	type TransactionByteFee = TransactionByteFee;
+	type LengthToFee = IdentityFee<Balance>;
 	type OperationalFeeMultiplier = OperationalFeeMultiplier;
 	type WeightToFee = IdentityFee<Balance>;
 	type FeeMultiplierUpdate = ();
@@ -372,8 +373,14 @@ impl pallet_timestake::Config for Runtime {
 	type Event = Event;
     type TimeProvider = pallet_timestamp::Pallet<Runtime>;
 	type Vrmeta = Balances;
-	
 }
+
+impl pallet_chainless_mint_iou::Config for Runtime {
+	type Event = Event;
+    type TimeProvider = pallet_timestamp::Pallet<Runtime>;
+	type Vrmeta = Balances;
+}
+
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
@@ -387,6 +394,7 @@ construct_runtime!(
 		Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent},
 		Aura: pallet_aura,
 		Timestake: pallet_timestake,
+		Chainless: pallet_chainless_mint_iou,
 		Grandpa: pallet_grandpa,
 		Balances: pallet_balances,
 		TransactionPayment: pallet_transaction_payment,

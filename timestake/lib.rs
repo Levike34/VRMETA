@@ -161,7 +161,7 @@ pub struct Disconnected {
         #[ink(message)]
         pub fn get_start_time(&self) -> u64 {
             let caller: AccountId = self.env().caller();
-            let start_time = self.start_time.get(&caller).unwrap();
+            let start_time = self.start_time.get(&caller).unwrap_or_default();
             start_time
         }
 
@@ -169,7 +169,7 @@ pub struct Disconnected {
         #[ink(message)]
         pub fn get_time_played(&self) -> u64  {
             let caller: AccountId = self.env().caller();
-            let start_time = self.start_time.get(&caller).unwrap();
+            let start_time = self.start_time.get(&caller).unwrap_or_default();
             if start_time < 1 {
                 0
             } else {
